@@ -1,0 +1,18 @@
+<!-- blog/includes/sidebar_categories.html -->
+<div class="card shadow-sm mb-4 border-0">
+    <div class="card-body">
+        <h5 class="card-title">Categories</h5>
+        <ul class="list-unstyled mb-0">
+            {% for category in categories %}
+                <li>
+                    <a href="{% url 'blog:posts_by_category' category.slug %}"
+                       class="text-decoration-none d-block py-1">
+                        {{ category.name }}
+                    </a>
+                </li>
+            {% empty %}
+                <li class="text-muted">No categories yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

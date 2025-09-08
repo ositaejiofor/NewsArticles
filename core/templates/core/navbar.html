@@ -1,0 +1,151 @@
+{% load static %}
+
+<!-- Particle Canvas -->
+<canvas id="navbarParticles"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 80px;
+               pointer-events: none; z-index: 1040;">
+</canvas>
+
+<!-- Scroll Progress Bar -->
+<div id="scrollProgress"></div>
+
+<nav class="navbar navbar-expand-lg shadow-sm fixed-top"
+     id="mainNavbar"
+     style="background: linear-gradient(90deg, #0d6efd, #6610f2);
+            transition: box-shadow 0.3s ease, backdrop-filter 0.3s ease;">
+    <div class="container">
+        
+        <!-- Brand (Logo top-left) -->
+        <a class="navbar-brand fw-bold d-flex align-items-center text-white brand-pulse"
+           href="{% url 'core:home' %}">
+            <img src="{% static 'images/logo.png' %}"
+                 alt="Logo"
+                 width="70" height="50"
+                 class="me-2 rounded shadow-sm">
+            <span>NewsPortal</span>
+        </a>
+
+        <!-- Mobile Toggler -->
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Nav links -->
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                
+                <!-- Normal Links -->
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold {% if request.path == '/' %}active{% endif %}"
+                       href="{% url 'core:home' %}">
+                        <i class="bi bi-house-door me-1"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold {% if '/blog/' in request.path %}active{% endif %}"
+                       href="{% url 'blog:home' %}">
+                        <i class="bi bi-file-earmark-text me-1"></i> Articles
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold {% if '/comments/' in request.path %}active{% endif %}"
+                       href="{% url 'comments:comments_home' %}">
+                        <i class="bi bi-chat-left-text me-1"></i> Comments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold {% if '/about/' in request.path %}active{% endif %}"
+                       href="{% url 'core:about' %}">
+                        <i class="bi bi-info-circle me-1"></i> About
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold {% if '/contact/' in request.path %}active{% endif %}"
+                       href="{% url 'core:contact' %}">
+                        <i class="bi bi-envelope me-1"></i> Contact
+                    </a>
+                </li>
+
+                <!-- Search Bar -->
+                <li class="nav-item ms-3">
+                    <form class="d-flex neon-search" method="get" action="{% url 'search:results' %}">
+                        <input class="form-control me-2" type="search" name="q" placeholder="Search..."
+                               aria-label="Search">
+                        <button class="btn btn-outline-light" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+                </li>
+
+                <!-- Authenticated / Guest -->
+                {% if user.is_authenticated %}
+                    <!-- User Dropdown -->
+                    <li class="nav-item dropdown ms-3">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle me-1"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3"
+                            aria-labelledby="userDropdown">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                    <i class="bi bi-person me-2"></i> Profile
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="{% url 'accounts:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item ms-3">
+                        <a class="nav-link text-white fw-semibold {% if '/accounts/login/' in request.path %}active{% endif %}"
+                           href="{% url 'accounts:login' %}">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white fw-semibold {% if '/accounts/register/' in request.path %}active{% endif %}"
+                           href="{% url 'accounts:register' %}">
+                            <i class="bi bi-person-plus me-1"></i> Sign Up
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Extra styling for search -->
+<style>
+.neon-search input {
+    background-color: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid #0ff;
+    box-shadow: 0 0 8px #0ff;
+}
+.neon-search input::placeholder {
+    color: #ccc;
+}
+.neon-search button {
+    border: 1px solid #0ff;
+    box-shadow: 0 0 6px #0ff;
+    transition: all 0.3s ease;
+}
+.neon-search button:hover {
+    background-color: #0ff;
+    color: #000;
+}
+</style>

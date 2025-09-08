@@ -1,0 +1,57 @@
+<!-- blog/includes/sidebar.html -->
+<div class="col-lg-4">
+    <!-- Search -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Search</h5>
+            <form method="GET" action="{% url 'blog:home' %}">
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search posts..."
+                           name="q"
+                           value="{{ query|default:'' }}">
+                    <button class="btn btn-primary" type="submit">Go</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Categories</h5>
+            <ul class="list-unstyled mb-0">
+                {% for category in categories %}
+                    <li>
+                        <a href="{% url 'blog:posts_by_category' category.slug %}"
+                           class="text-decoration-none">
+                            {{ category.name }}
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="text-muted">No categories yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Recent Posts -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Recent Posts</h5>
+            <ul class="list-unstyled mb-0">
+                {% for recent in recent_posts %}
+                    <li>
+                        <a href="{% url 'blog:post_detail' recent.pk %}"
+                           class="text-decoration-none">
+                            {{ recent.title }}
+                        </a>
+                    </li>
+                {% empty %}
+                    <li class="text-muted">No recent posts.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>

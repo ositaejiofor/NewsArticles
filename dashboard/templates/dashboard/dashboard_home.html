@@ -1,0 +1,166 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard Home{% endblock %}
+
+{% block content %}
+
+<!-- ================== Navbar ================== -->
+{% include 'core/navbar.html' %}
+
+<div class="container-fluid py-4 main-content">
+
+    <!-- ================== Stats Cards ================== -->
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm">
+                <h6>Total Articles</h6>
+                <p class="display-6">{{ total_articles|default:0 }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm">
+                <h6>Total Users</h6>
+                <p class="display-6">{{ total_users|default:0 }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm">
+                <h6>New Comments</h6>
+                <p class="display-6">{{ new_comments|default:0 }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm">
+                <h6>Notifications</h6>
+                <p class="display-6">{{ notifications|default:0 }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== Charts ================== -->
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5>Articles Published (Monthly)</h5>
+                <canvas id="articlesChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5>User Activity</h5>
+                <canvas id="userChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================== Recent Articles ================== -->
+    <div class="mt-5">
+        <h4>Recent Articles</h4>
+        <table class="table table-striped table-hover mt-2">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in recent_articles %}
+                <tr>
+                    <td>{{ article.title }}</td>
+                    <td>{{ article.author.username }}</td>
+                    <td>{{ article.created_at|date:"Y-m-d" }}</td>
+                    <td>
+                        {% if article.status == 'published' %}
+                            <span class="badge bg-success">Published</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Draft</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No recent articles found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block footer %}
+<!-- ================== Sticky Footer ================== -->
+<footer class="bg-dark text-white pt-4 pb-3 sticky-footer animate__animated animate__fadeInUp">
+    <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <div class="mb-2 mb-md-0">
+            <span>© {{ current_year|default:2025 }} <strong>NewsPortal</strong>. All Rights Reserved.</span>
+        </div>
+        <div>
+            <a href="https://facebook.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-facebook fs-5"></i></a>
+            <a href="https://twitter.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-twitter fs-5"></i></a>
+            <a href="https://instagram.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-instagram fs-5"></i></a>
+            <a href="https://linkedin.com" class="text-white social-icon" target="_blank"><i class="bi bi-linkedin fs-5"></i></a>
+        </div>
+    </div>
+</footer>
+
+<!-- ================== Charts JS ================== -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const articlesCtx = document.getElementById('articlesChart').getContext('2d');
+    const articlesChart = new Chart(articlesCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [{
+                label: 'Articles Published',
+                data: {{ monthly_data|safe }},
+                backgroundColor: 'rgba(255, 193, 7, 0.7)',
+                borderColor: 'rgba(255, 193, 7, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+
+    const userCtx = document.getElementById('userChart').getContext('2d');
+    const userChart = new Chart(userCtx, {
+        type: 'line',
+        data: {
+            labels: {{ user_labels|safe }},
+            datasets: [{
+                label: 'User Activity',
+                data: {{ user_data|safe }},
+                fill: true,
+                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                tension: 0.3
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+
+<!-- ================== Footer CSS ================== -->
+<style>
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; }
+.main-content { flex: 1 0 auto; }
+.sticky-footer { flex-shrink: 0; }
+.social-icon {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.social-icon:hover {
+    color: #ffc107;
+    transform: scale(1.2);
+}
+</style>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}

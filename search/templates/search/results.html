@@ -1,0 +1,72 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% load search_extras %}
+
+{% block content %}
+<div class="container py-5" style="margin-top: 80px;">
+
+    <!-- Page Title -->
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-white">🔎 Search Results</h2>
+        {% if query %}
+            <p class="text-light">You searched for: 
+                <span class="fw-bold text-info">"{{ query }}"</span>
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- Results -->
+    {% if results %}
+        <div class="row g-4">
+            {% for article in results %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-lg border-0 neon-card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{% url 'blog:detail' article.slug %}" 
+                                   class="stretched-link text-decoration-none text-white">
+                                    {{ article.title|highlight:query }}
+                                </a>
+                            </h5>
+                            <p class="card-text text-muted small">
+                                {{ article.content|truncatewords:20|highlight:query }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-muted small">
+                            <i class="bi bi-person me-1"></i> {{ article.author.username }}
+                            {% if article.category %}
+                                | <i class="bi bi-tag me-1"></i> {{ article.category.name }}
+                            {% endif %}
+                            | <i class="bi bi-calendar me-1"></i> {{ article.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning text-center shadow-sm">
+            <i class="bi bi-exclamation-circle me-2"></i>
+            No results found for <strong>{{ query }}</strong>.
+        </div>
+    {% endif %}
+</div>
+
+<!-- Neon Highlight Styling -->
+<style>
+.neon-highlight {
+    color: #0ff;
+    font-weight: bold;
+    text-shadow: 0 0 5px #0ff, 0 0 10px #0ff;
+}
+.neon-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid #0ff;
+    box-shadow: 0 0 12px #0ff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.neon-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px #0ff;
+}
+</style>
+{% endblock %}

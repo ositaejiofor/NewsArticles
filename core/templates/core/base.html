@@ -1,0 +1,150 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}News Portal{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    <!-- You can also use .ico: -->
+    <!-- <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}"> -->
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Custom Navbar + Global Styles -->
+    <link rel="stylesheet" href="{% static 'core/css/navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    {% include "core/navbar.html" %}
+
+    <!-- Flash Messages -->
+    <div class="container mt-3">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Page Content -->
+    <main class="container mt-5 pt-4 main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include "core/footer.html" %}
+    <footer class="bg-dark text-white pt-4 pb-3 sticky-footer animate__animated animate__fadeInUp">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <div>
+                <a href="https://facebook.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-facebook fs-5"></i></a>
+                <a href="https://twitter.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-twitter fs-5"></i></a>
+                <a href="https://instagram.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-instagram fs-5"></i></a>
+                <a href="https://linkedin.com" class="text-white social-icon" target="_blank"><i class="bi bi-linkedin fs-5"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Navbar JS -->
+    <script src="{% static 'core/js/navbar.js' %}"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <!-- Sticky Footer & Social Icon Styles -->
+    <style>
+    html, body {
+        height: 100%;
+    }
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+    .main-content {
+        flex: 1 0 auto;
+    }
+    .sticky-footer {
+        flex-shrink: 0;
+    }
+    .social-icon {
+        transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .social-icon:hover {
+        color: #ffc107;
+        transform: scale(1.2);
+    }
+    </style>
+
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+
+
+    <!-- Back to Top Button -->
+<button id="backToTopBtn" class="btn neon-btn shadow-lg"
+        style="position: fixed; bottom: 40px; right: 40px; display: none; z-index: 1050; border-radius: 50%; width: 50px; height: 50px; font-size: 1.5rem;">
+    <i class="bi bi-arrow-up"></i>
+</button>
+
+<!-- Neon CSS + Pulse Animation -->
+<style>
+@keyframes neonPulse {
+    0%, 100% {
+        box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    }
+    50% {
+        box-shadow: 0 0 20px #0ff, 0 0 30px #0ff;
+    }
+}
+
+.neon-btn {
+    background-color: rgba(0,255,255,0.1);
+    color: #0ff;
+    border: 1px solid #0ff;
+    box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    transition: all 0.3s ease;
+    animation: neonPulse 1.5s infinite alternate;
+}
+.neon-btn:hover {
+    background-color: #0ff;
+    color: #000;
+    box-shadow: 0 0 25px #0ff, 0 0 40px #0ff;
+}
+</style>
+
+<!-- Back to Top JS -->
+<script>
+const backToTopBtn = document.getElementById("backToTopBtn");
+
+// Show/hide button on scroll
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 100) {
+        backToTopBtn.style.display = "block";
+    } else {
+        backToTopBtn.style.display = "none";
+    }
+});
+
+// Smooth scroll to top
+backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+</script>
+
+</body>
+</html>

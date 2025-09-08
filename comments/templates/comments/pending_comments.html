@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Pending Comments</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Post</th>
+            <th>Content</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="pendingCommentsList">
+        {% for comment in comments %}
+        <tr id="comment-{{ comment.id }}">
+            <td>{{ comment.user.username }}</td>
+            <td>{{ comment.post.title }}</td>
+            <td>{{ comment.content }}</td>
+            <td>{{ comment.created_at|date:"M d, Y H:i" }}</td>
+            <td>
+                <button class="btn btn-success btn-sm approveBtn" data-id="{{ comment.id }}">Approve</button>
+                <button class="btn btn-danger btn-sm rejectBtn" data-id="{{ comment.id }}">Reject</button>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No pending comments.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    function updateCommentStatus(commentId, action) {
+        $.ajax({
+            url: "{% url 'update_comment_status' %}",
+            type: "POST",
+            data: {
+                "id": commentId,
+                "action": action,
+                "csrfmiddlewaretoken": "{{ csrf_token }}"
+            },
+            success: function(data){
+                if(data.success){
+                    $("#comment-" + commentId).remove();
+                }
+            }
+        });
+    }
+
+    $(".approveBtn").click(function(){
+        let id = $(this).data("id");
+        updateCommentStatus(id, "approve");
+    });
+
+    $(".rejectBtn").click(function(){
+        let id = $(this).data("id");
+        updateCommentStatus(id, "reject");
+    });
+});
+</script>
+{% endblock %}

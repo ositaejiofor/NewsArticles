@@ -1,0 +1,10 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block content %}
+  <h1>{{ article.title }}</h1>
+  <p class="text-muted">By {{ article.author.username }} | {{ article.created_at }}</p>
+  <hr>
+  <div>{{ article.content|linebreaks }}</div>
+{% endblock %}

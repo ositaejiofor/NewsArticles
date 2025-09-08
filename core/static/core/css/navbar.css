@@ -1,0 +1,118 @@
+/* Particle canvas */
+#navbarParticles {
+    background: transparent;
+}
+
+/* Scroll Progress Bar */
+#scrollProgress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 0%;
+    z-index: 1050;
+    background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700);
+    background-size: 200% 100%;
+    transition: width 0.25s ease;
+}
+#scrollProgress.shimmer {
+    animation: shimmer 2s linear infinite;
+}
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Brand logo pulse */
+.brand-pulse img {
+    transition: transform 0.3s ease;
+}
+.brand-pulse:hover img {
+    transform: scale(1.08);
+}
+
+/* Hover underline */
+.navbar-nav .nav-link.nav-animated,
+.navbar-nav .dropdown-item.nav-animated {
+    position: relative;
+    display: inline-block;
+}
+.navbar-nav .nav-link.nav-animated::after,
+.navbar-nav .dropdown-item.nav-animated::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    transition: width 0.3s ease;
+    border-radius: 1px;
+}
+.navbar-nav .nav-link.nav-animated:hover::after,
+.navbar-nav .dropdown-item.nav-animated:hover::after,
+.navbar-nav .nav-link.nav-animated.active::after,
+.navbar-nav .dropdown-item.nav-animated.active::after {
+    width: 100%;
+}
+
+/* Glow trail */
+.glow-trail {
+    position: relative;
+    transition: color 0.3s ease;
+}
+.glow-trail::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 0;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,215,0,0.4), rgba(255,140,0,0));
+    border-radius: 4px;
+    transition: width 0.4s ease, opacity 0.4s ease;
+    z-index: -1;
+}
+.glow-trail:hover::before {
+    width: 100%;
+    opacity: 1;
+}
+
+/* Dropdown styling */
+.navbar-nav .dropdown-item.active {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    background: linear-gradient(90deg, rgba(255,215,0,0.1), rgba(255,140,0,0.1));
+}
+.dropdown-menu {
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+/* Hover effects */
+.navbar-nav .nav-link:hover,
+.navbar-nav .dropdown-item:hover {
+    color: #ffd700 !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.25rem;
+}
+.navbar-nav .nav-link.active {
+    font-weight: 600;
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.15);
+    border-radius: 0.25rem;
+}
+
+/* Navbar toggler */
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+.navbar-toggler-icon {
+    filter: invert(1);
+}
+
+/* Floating shadow on scroll */
+.navbar-scrolled {
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    backdrop-filter: blur(5px);
+    transform: translateY(-2px);
+    transition: box-shadow 0.3s ease, backdrop-filter 0.3s ease, transform 0.3s ease;
+}

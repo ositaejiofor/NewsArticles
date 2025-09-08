@@ -1,0 +1,103 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }} - Blog{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Post Content -->
+    <div class="col-lg-8">
+        <article class="card shadow-sm border-0 mb-4">
+            {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+            {% endif %}
+            <div class="card-body">
+                <h1 class="card-title">{{ post.title }}</h1>
+                <p class="text-muted">
+                    By <strong>{{ post.author }}</strong> | {{ post.created_at|date:"F j, Y" }}
+                </p>
+                <hr>
+                <div class="card-text">
+                    {{ post.content|linebreaks }}
+                </div>
+            </div>
+        </article>
+
+        <!-- Comments Section -->
+        <section class="mb-5">
+            <h4 class="mb-3">Comments ({{ post.comments.count }})</h4>
+
+            {% for comment in post.comments.all %}
+                <div class="card mb-3 shadow-sm border-0">
+                    <div class="card-body">
+                        <p class="mb-1"><strong>{{ comment.author }}</strong></p>
+                        <p class="text-muted small mb-2">{{ comment.created_at|date:"F j, Y, g:i a" }}</p>
+                        <p>{{ comment.content }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="alert alert-info">No comments yet. Be the first to comment!</div>
+            {% endfor %}
+
+            <!-- Add Comment Form -->
+            {% if user.is_authenticated %}
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h5 class="card-title">Leave a Comment</h5>
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <p>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                        Login to add a comment
+                    </a>
+                </p>
+            {% endif %}
+        </section>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Recent Posts -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Recent Posts</h5>
+                <ul class="list-unstyled mb-0">
+                    {% for recent in recent_posts %}
+                        <li>
+                            <a href="{% url 'blog:post_detail' recent.pk %}" class="text-decoration-none">
+                                {{ recent.title }}
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li class="text-muted">No recent posts.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Categories</h5>
+                <ul class="list-unstyled mb-0">
+                    {% for category in categories %}
+                        <li>
+                            <a href="{% url 'blog:posts_by_category' category.slug %}" class="text-decoration-none">
+                                {{ category.name }}
+                            </a>
+                        </li>
+                    {% empty %}
+                        <li class="text-muted">No categories yet.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

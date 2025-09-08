@@ -1,0 +1,81 @@
+<!-- Dark Animated Footer -->
+<footer class="bg-dark text-white pt-5 pb-4 animate__animated animate__fadeInUp">
+    <div class="container text-md-left">
+        <div class="row text-md-left">
+
+            <!-- Branding -->
+            <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
+                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">NewsPortal</h5>
+                <p>Stay informed with latest news, updates, and insights. Connect with the community and never miss a story.</p>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+                <h6 class="text-uppercase mb-4 font-weight-bold text-warning">Quick Links</h6>
+                <p><a href="/" class="text-white footer-link">Home</a></p>
+                <p><a href="/dashboard/" class="text-white footer-link">Dashboard</a></p>
+                <p><a href="/blog/" class="text-white footer-link">Articles</a></p>
+                <p><a href="/contacts/" class="text-white footer-link">Contact</a></p>
+            </div>
+
+            <!-- Resources -->
+            <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mt-3">
+                <h6 class="text-uppercase mb-4 font-weight-bold text-warning">Resources</h6>
+                <p><a href="#" class="text-white footer-link">Privacy Policy</a></p>
+                <p><a href="#" class="text-white footer-link">Terms & Conditions</a></p>
+                <p><a href="#" class="text-white footer-link">Support</a></p>
+                <p><a href="#" class="text-white footer-link">FAQs</a></p>
+            </div>
+
+            <!-- Social Media -->
+            <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+                <h6 class="text-uppercase mb-4 font-weight-bold text-warning">Follow Us</h6>
+                <a href="https://facebook.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-facebook fs-4"></i></a>
+                <a href="https://twitter.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-twitter fs-4"></i></a>
+                <a href="https://instagram.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-instagram fs-4"></i></a>
+                <a href="https://linkedin.com" class="text-white me-3 social-icon" target="_blank"><i class="bi bi-linkedin fs-4"></i></a>
+            </div>
+
+        </div>
+
+        <hr class="mb-4 bg-warning">
+
+        <!-- Copyright -->
+        <div class="row align-items-center">
+            <div class="col-md-7 col-lg-8">
+                <p>© {{ current_year|default:2025 }} NewsPortal. All Rights Reserved.</p>
+            </div>
+            <div class="col-md-5 col-lg-4">
+                <div class="text-center text-md-right">
+                    <a href="#" class="text-white footer-link me-3">Privacy</a>
+                    <a href="#" class="text-white footer-link">Terms</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<!-- Animate.css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+<!-- Custom Footer Styles -->
+<style>
+.footer-link {
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+.footer-link:hover {
+    color: #ffc107; /* Gold hover */
+    text-decoration: underline;
+}
+.social-icon {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+.social-icon:hover {
+    color: #ffc107;
+    transform: scale(1.2);
+}
+</style>
