@@ -1,0 +1,104 @@
+{% extends "core/base.html" %}
+{% block title %}Support NewsPortal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Support NewsPortal</h2>
+    <p class="text-center text-muted mb-5">
+        Your contribution helps us deliver quality news to our readers.
+    </p>
+
+    <!-- Donation Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form id="donationForm" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Donation Amount (₦)</label>
+                    <input type="number" class="form-control" id="amount" name="amount" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message (Optional)</label>
+                    <textarea class="form-control" id="message" name="message"></textarea>
+                </div>
+
+                <h5 class="mt-4">Payment Options</h5>
+
+                <!-- Flutterwave Button -->
+                <button type="button" class="btn btn-warning w-100 mb-3" id="donateBtn">Donate Online (Flutterwave)</button>
+
+                <!-- Manual Bank Transfer -->
+                <div class="card p-3">
+                    <h6>Bank Transfer</h6>
+                    <p>Use any of the accounts below to make a donation manually:</p>
+                    <ul class="list-unstyled">
+                        <li>Bank: GTBank | Account Name: NewsPortal | Account Number: 1234567890</li>
+                        <li>Bank: Access Bank | Account Name: NewsPortal | Account Number: 0987654321</li>
+                    </ul>
+                    <p>After payment, send proof via email to <strong>donations@newsportal.com</strong> to confirm your donation.</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Donor Wall -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3 class="text-center mb-4">Our Generous Donors</h3>
+            <ul class="list-group">
+                {% for donor in donors %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ donor.name }}
+                    <span class="badge bg-warning text-dark">₦{{ donor.amount }}</span>
+                </li>
+                {% empty %}
+                <li class="list-group-item">No donations yet. Be the first to donate!</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Flutterwave Integration -->
+<script src="https://checkout.flutterwave.com/v3.js"></script>
+<script>
+document.getElementById('donateBtn').addEventListener('click', function () {
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const amount = document.getElementById('amount').value;
+
+    if (!name || !email || !amount) {
+        alert("Please fill all required fields.");
+        return;
+    }
+
+    FlutterwaveCheckout({
+        public_key: "{{ FLUTTERWAVE_PUBLIC_KEY }}",
+        tx_ref: "np-" + Math.floor(Math.random() * 1000000),
+        amount: amount,
+        currency: "NGN",
+        payment_options: "card,banktransfer,ussd",
+        customer: {
+            email: email,
+            name: name,
+        },
+        callback: function (data) {
+            window.location.href = "{% url 'flutterwave_success' %}?tx_ref=" + data.tx_ref + "&status=" + data.status;
+        },
+        customizations: {
+            title: "NewsPortal Donation",
+            description: "Support our news platform",
+            logo: "{% static 'images/logo.png' %}"
+        },
+    });
+});
+</script>
+{% endblock %}

@@ -1,13 +1,36 @@
 {% extends "core/base.html" %}
 {% load static %}
+
 {% block content %}
 <h2>Login</h2>
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {{ form.username.label_tag }}<br>
+    {{ form.username }}<br><br>
+
+    {{ form.password.label_tag }}<br>
+    <div style="position: relative;">
+        {{ form.password }}
+        <span id="togglePassword" 
+              style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+                     cursor: pointer;">👁️</span>
+    </div>
+    <br>
+
     {% if next %}
         <input type="hidden" name="next" value="{{ next }}">
     {% endif %}
     <button type="submit">Login</button>
 </form>
+
+<script>
+    const passwordField = document.getElementById("id_password");
+    const togglePassword = document.getElementById("togglePassword");
+
+    togglePassword.addEventListener("click", function() {
+        const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+        passwordField.setAttribute("type", type);
+        this.textContent = type === "password" ? "👁️" : "🙈";
+    });
+</script>
 {% endblock %}

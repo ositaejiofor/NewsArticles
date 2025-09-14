@@ -1,0 +1,11 @@
+{% for comment in comments %}
+    {% include "comments/comment_item.html" with comment=comment %}
+{% endfor %}
+
+{% if page_obj.has_next %}
+<div class="text-center mt-3">
+    <button id="load-more-btn" data-next-page="{{ page_obj.next_page_number }}" class="btn btn-secondary">
+        Load More Comments
+    </button>
+</div>
+{% endif %}

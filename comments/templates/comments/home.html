@@ -3,6 +3,108 @@
 {% block title %}Comments Home{% endblock %}
 
 {% block content %}
-<h1>Welcome to the Comments Section</h1>
-<p>This is a test page.</p>
+<div class="container mt-5">
+    <h1 class="mb-4">Comments Section</h1>
+
+    <!-- Comment Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="POST" action="{% url 'comments:add_comment' post_id %}">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea name="content" class="form-control" rows="3" placeholder="Write a comment..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Comments List -->
+    <div class="comments-list">
+        {% for comment in comments %}
+        <div class="card mb-3" id="comment-{{ comment.id }}">
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">{{ comment.user.username }} • {{ comment.created_at|naturaltime }}</h6>
+                <p class="card-text">{{ comment.content|safe }}</p>
+
+                <!-- Buttons -->
+                <div class="mb-2">
+                    {% if request.user == comment.user %}
+                    <button class="btn btn-sm btn-outline-secondary" onclick="toggleEdit({{ comment.id }})">Edit</button>
+                    {% endif %}
+                    {% if request.user.is_authenticated %}
+                    <button class="btn btn-sm btn-outline-primary" onclick="toggleReply({{ comment.id }})">Reply</button>
+                    <button class="btn btn-sm btn-outline-success" onclick="toggleLike({{ comment.id }})">
+                        Like (<span id="like-count-{{ comment.id }}">{{ comment.like_count }}</span>)
+                    </button>
+                    {% endif %}
+                </div>
+
+                <!-- Edit Form -->
+                <div class="edit-form mt-2 d-none" id="edit-form-{{ comment.id }}">
+                    <form method="POST" action="{% url 'comments:edit_comment' comment.id %}">
+                        {% csrf_token %}
+                        <textarea name="content" class="form-control mb-2" rows="2">{{ comment.content }}</textarea>
+                        <button type="submit" class="btn btn-sm btn-warning">Save</button>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEdit({{ comment.id }})">Cancel</button>
+                    </form>
+                </div>
+
+                <!-- Reply Form -->
+                <div class="reply-form mt-2 d-none" id="reply-form-{{ comment.id }}">
+                    <form method="POST" action="{% url 'comments:add_comment' post_id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                        <textarea name="content" class="form-control mb-2" rows="2" placeholder="Write a reply..."></textarea>
+                        <button type="submit" class="btn btn-sm btn-success">Reply</button>
+                    </form>
+                </div>
+
+                <!-- Nested Replies -->
+                {% if comment.replies.all %}
+                <div class="replies mt-3 ms-4">
+                    {% for reply in comment.replies.all %}
+                        {% include "comments/comment_item.html" with comment=reply post_id=post_id %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+// Toggle Reply & Edit Forms
+function toggleReply(commentId){
+    const form = document.getElementById('reply-form-' + commentId);
+    form.classList.toggle('d-none');
+}
+
+function toggleEdit(commentId){
+    const form = document.getElementById('edit-form-' + commentId);
+    form.classList.toggle('d-none');
+}
+
+// AJAX Like/Unlike
+async function toggleLike(commentId){
+    try {
+        const res = await fetch("{% url 'comments:toggle_like' %}", {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `id=${commentId}`
+        });
+        const data = await res.json();
+        if(data.like_count !== undefined){
+            document.getElementById('like-count-' + commentId).textContent = data.like_count;
+        }
+    } catch(e){
+        console.error("Like error:", e);
+    }
+}
+</script>
 {% endblock %}

@@ -1,0 +1,114 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Article -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2>{{ article.title }}</h2>
+      <p><strong>Author:</strong> {{ article.author }}</p>
+      <hr>
+      <div>{{ article.content|safe }}</div>
+    </div>
+  </div>
+
+  <!-- Comments Header -->
+  <h4>Comments ({{ comments.count }})</h4>
+
+  <!-- New Top-Level Comment Form -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5>Leave a Comment</h5>
+      <form id="new-comment-form" method="post" action="{% url 'comments:add_comment' %}">
+        {% csrf_token %}
+        {{ form.media }}
+        {{ form|crispy }}
+        <input type="hidden" name="article_id" value="{{ article.id }}">
+        <button type="submit" class="btn btn-success">Post Comment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div id="comments-section">
+    {% for comment in comments %}
+      {% include "blog/_comment.html" with comment=comment reply_form=form %}
+    {% empty %}
+      <p>No comments yet. Be the first to comment!</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- ====== AJAX Scripts ====== -->
+<script>
+const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+// --- Like Comment ---
+function toggleLike(commentId) {
+  fetch("{% url 'comments:toggle_like' %}", {
+    method: "POST",
+    headers: {
+      "X-CSRFToken": csrftoken,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: `comment_id=${commentId}`
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById(`like-count-${commentId}`).textContent = data.likes_count;
+  });
+}
+
+// --- Reply Comment ---
+document.addEventListener("submit", function(e) {
+  if (e.target.classList.contains("reply-comment-form")) {
+    e.preventDefault();
+    const form = e.target;
+    const commentId = form.dataset.comment;
+    const content = form.querySelector("textarea").value;
+
+    fetch(`/comments/reply/${commentId}/`, {   // ✅ fixed URL with commentId
+      method: "POST",
+      headers: {
+        "X-CSRFToken": csrftoken,
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `content=${encodeURIComponent(content)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document
+          .getElementById(`replies-${data.parent_id}`)
+          .insertAdjacentHTML("beforeend", data.html);
+        form.querySelector("textarea").value = "";
+        form.classList.add("d-none");
+      }
+    });
+  }
+});
+
+
+// --- New Comment (Top-level) ---
+document.getElementById("new-comment-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const form = e.target;
+  const formData = new URLSearchParams(new FormData(form));
+
+  fetch("{% url 'comments:add_comment' %}", {
+    method: "POST",
+    headers: { "X-CSRFToken": csrftoken },
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById("comments-section").insertAdjacentHTML("afterbegin", data.html);
+      form.reset();
+    }
+  });
+});
+</script>
+{% endblock %}

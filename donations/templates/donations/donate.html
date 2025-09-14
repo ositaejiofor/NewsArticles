@@ -1,0 +1,63 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Donate to NewsPortal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Support NewsPortal</h2>
+    <p class="text-center mb-5">Choose your preferred payment method and make a contribution to support quality journalism.</p>
+
+    {% if success %}
+        <div class="alert alert-success">{{ success }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="id_name" class="form-label">Your Name</label>
+            {{ form.name|as_crispy_field }}
+        </div>
+        <div class="mb-3">
+            <label for="id_email" class="form-label">Email (optional)</label>
+            {{ form.email|as_crispy_field }}
+        </div>
+        <div class="mb-3">
+            <label for="id_amount" class="form-label">Donation Amount (NGN)</label>
+            {{ form.amount|as_crispy_field }}
+        </div>
+
+        <div class="mb-4">
+            <label for="id_payment_method" class="form-label">Payment Method</label>
+            {{ form.payment_method|as_crispy_field }}
+        </div>
+
+        <button type="submit" class="btn btn-warning btn-lg w-100">Donate Now</button>
+    </form>
+
+    <hr class="my-5">
+
+    <div class="manual-payments mt-4">
+        <h4>Manual / OPAY Payment</h4>
+        <p>To pay via OPAY, send your donation to the following account and submit your details above:</p>
+        <ul class="list-unstyled">
+            <li><strong>Account Name:</strong> Osita Collins Ejiofor</li>
+            <li><strong>Account Number:</strong> 8039281188</li>
+            <li><strong>Bank / Service:</strong> OPAY</li>
+        </ul>
+        <p>Once payment is received, we will verify it and your name will appear on the donor wall.</p>
+    </div>
+</div>
+
+<!-- Optional: Some styling -->
+<style>
+.manual-payments {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+</style>
+{% endblock %}

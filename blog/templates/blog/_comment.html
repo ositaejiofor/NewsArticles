@@ -1,0 +1,48 @@
+{% load crispy_forms_tags %}
+
+<div class="comment mb-3" id="comment-{{ comment.id }}">
+  <!-- Comment Body -->
+  <div class="card">
+    <div class="card-body p-2">
+      <p>
+        <strong>{{ comment.user.username }}</strong>
+        <small class="text-muted">• {{ comment.created_at|date:"M d, Y H:i" }}</small>
+      </p>
+      <div id="comment-content-{{ comment.id }}">{{ comment.content|safe }}</div>
+
+      <!-- Actions -->
+      <div class="mt-2">
+        <!-- Like -->
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                onclick="toggleLike({{ comment.id }})">
+          👍 Like (<span id="like-count-{{ comment.id }}">{{ comment.likes.count }}</span>)
+        </button>
+
+        <!-- Reply toggle -->
+        <button type="button" class="btn btn-sm btn-link"
+                onclick="document.getElementById('reply-form-{{ comment.id }}').classList.toggle('d-none')">
+          Reply
+        </button>
+      </div>
+
+      <!-- Reply Form -->
+      <form method="post"
+            class="reply-comment-form d-none mt-2"
+            id="reply-form-{{ comment.id }}"
+            data-comment="{{ comment.id }}"
+            data-article="{{ comment.article.id }}">
+        {% csrf_token %}
+        <textarea name="content" rows="2" class="form-control mb-2"
+                  placeholder="Write a reply..."></textarea>
+        <button type="submit" class="btn btn-sm btn-success">Post Reply</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Replies -->
+  <div id="replies-{{ comment.id }}" class="ms-4 mt-2">
+    {% for child in comment.children.all %}
+      {% include "blog/_comment.html" with comment=child reply_form=reply_form %}
+    {% endfor %}
+  </div>
+</div>

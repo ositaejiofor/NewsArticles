@@ -31,3 +31,12 @@ def about(request):
 
 def contact(request):
     return render(request, "core/contact.html")
+
+def privacy_policy(request):
+    return render(request, "core/privacy_policy.html")
+
+def terms_of_service(request):
+    return render(request, "core/terms_of_service.html")
+
+def disclaimer(request):
+    return render(request, "core/disclaimer.html")

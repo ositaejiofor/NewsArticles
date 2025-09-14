@@ -1,0 +1,18 @@
+{% extends "core/base.html" %}
+{% block title %}Our Donors{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">Our Generous Donors</h2>
+    <ul class="list-group">
+        {% for donor in donors %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <strong>{{ donor.name }}</strong>
+                <span>${{ donor.amount }}</span>
+                <small class="text-muted">{{ donor.created_at|date:"M d, Y" }}</small>
+            </li>
+        {% empty %}
+            <p>No donations yet. Be the first to support us!</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

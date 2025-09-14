@@ -1,0 +1,43 @@
+{% load crispy_forms_tags %}
+
+<div class="comment" id="comment-{{ comment.id }}" style="margin-left: {{ comment.get_depth|add:'0' }}0px; border-left: 2px solid #e0e0e0; padding-left:10px; margin-bottom:10px;">
+
+  <!-- Comment Content -->
+  <p id="comment-content-{{ comment.id }}">
+    <strong>{{ comment.user.username }}</strong> • {{ comment.created_at|date:"M d, Y H:i" }}  
+    <br>
+    {{ comment.content|safe }}
+  </p>
+
+  <!-- Like Button -->
+  <button class="btn btn-sm btn-outline-primary" onclick="toggleLike({{ comment.id }})">
+    👍 Like (<span id="like-count-{{ comment.id }}">{{ comment.like_count }}</span>)
+  </button>
+
+  <!-- Edit Button (for owner) -->
+  {% if request.user == comment.user %}
+    <button class="btn btn-sm btn-outline-secondary" onclick="toggleEdit({{ comment.id }})">✏ Edit</button>
+    <form class="edit-comment-form d-none mt-2" id="edit-form-{{ comment.id }}" data-comment="{{ comment.id }}">
+      {% csrf_token %}
+      <textarea class="form-control" rows="2">{{ comment.content }}</textarea>
+      <button type="submit" class="btn btn-sm btn-primary mt-1">Save</button>
+    </form>
+  {% endif %}
+
+  <!-- Reply Button -->
+  <button class="btn btn-sm btn-link" onclick="toggleReply({{ comment.id }})">↩ Reply</button>
+
+  <!-- Reply Form -->
+  <form class="reply-comment-form d-none mt-2" id="reply-form-{{ comment.id }}" data-comment="{{ comment.id }}" data-article="{{ comment.article.id }}">
+    {% csrf_token %}
+    <textarea class="form-control" rows="2" placeholder="Write a reply..."></textarea>
+    <button type="submit" class="btn btn-sm btn-success mt-1">Reply</button>
+  </form>
+
+  <!-- Nested Replies -->
+  <div id="replies-{{ comment.id }}" class="ms-3 mt-2">
+    {% for child in comment.children.all %}
+      {% include "blog/comment_item.html" with comment=child %}
+    {% endfor %}
+  </div>
+</div>

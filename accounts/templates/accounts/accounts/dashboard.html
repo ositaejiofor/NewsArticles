@@ -1,0 +1,32 @@
+{% extends "core/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Dashboard</h2>
+    <p>Welcome, {{ request.user.username }}!</p>
+
+    <h4>Your Articles</h4>
+    {% if articles %}
+        <ul>
+        {% for article in articles %}
+            <li><a href="{% url 'blog:article_detail' article.slug %}">{{ article.title }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No articles yet.</p>
+    {% endif %}
+
+    <h4>Your Comments</h4>
+    {% if comments %}
+        <ul>
+        {% for comment in comments %}
+            <li>{{ comment.content }} - on <a href="{% url 'blog:article_detail' comment.article.slug %}">{{ comment.article.title }}</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No comments yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,196 +1,226 @@
-from pathlib import Path
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 # ------------------------
 # Base directory
 # ------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')
 
 # ------------------------
-# Temporary debug (remove after fixing templates)
+# Load environment variables
 # ------------------------
-print("BASE_DIR:", BASE_DIR)
-print("TEMPLATES DIRS:", [BASE_DIR / "templates"])
-print("INSTALLED_APPS:", [
-    'core', 'accounts', 'blog', 'dashboard', 'comments',
-    'ads', 'api', 'composer_app', 'adminpanel'
-])
+load_dotenv(BASE_DIR / ".env")
 
 # ------------------------
 # Security
 # ------------------------
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-dev-key')
-DEBUG = os.getenv('DEBUG', '1') == '1'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-placeholder")
+DEBUG = os.getenv("DEBUG", "True") == "True"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# ------------------------
+# Custom user model
+# ------------------------
+AUTH_USER_MODEL = "accounts.CustomUser"
+LOGIN_REDIRECT_URL = "profile"
 
 # ------------------------
 # Installed apps
 # ------------------------
 INSTALLED_APPS = [
-    # Django default apps
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'django.contrib.sitemaps',
+    # Django apps
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.humanize",
+    "django.contrib.sites",
+    "django.contrib.sitemaps",
 
     # Third-party apps
-    'storages',
-    'django_celery_results',
-    'rest_framework',
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'django_extensions',
-    'widget_tweaks',
+    "ckeditor",
+    "ckeditor_uploader",
+    "crispy_forms",
+    "crispy_bootstrap5",
 
     # Local apps
-    'core',
-    'accounts',
-    'blog',
-    'dashboard',
-    'comments',
-    'ads',
-    'api',
-    'composer_app',
-    'adminpanel',
-    'notifications',
-    'search',
+    "blog",
+    "dashboard",
+    "core",
+    "accounts",
+    "comments",
+    "search",
+    "composer_app",
+    "notifications",
+    "api",
+    "ads",
+    "donations",
 ]
 
-# Crispy Forms
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
-
-SITE_ID = 1
 
 # ------------------------
 # Middleware
 # ------------------------
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # ------------------------
-# URL / WSGI
+# CKEditor settings
 # ------------------------
-ROOT_URLCONF = 'newsportal.urls'
-WSGI_APPLICATION = 'newsportal.wsgi.application'
+CKEDITOR_UPLOAD_PATH = "uploads/articles/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "Custom",
+        "height": 400,
+        "width": "100%",
+        "toolbar_Custom": [
+            ["Bold", "Italic", "Underline", "Strike"],
+            ["NumberedList", "BulletedList", "Blockquote"],
+            ["Link", "Unlink"],
+            ["Image", "CodeSnippet", "Embed", "Table"],
+            ["RemoveFormat", "Source"],
+        ],
+        "extraPlugins": ",".join([
+            "uploadimage",
+            "codesnippet",
+            "embed",
+            "autolink",
+        ]),
+        "codeSnippet_theme": "monokai_sublime",
+    }
+}
+
+# ------------------------
+# URLs and WSGI
+# ------------------------
+ROOT_URLCONF = "newsportal.urls"
+WSGI_APPLICATION = "newsportal.wsgi.application"
 
 # ------------------------
 # Templates
 # ------------------------
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],  # Project-wide templates
-        'APP_DIRS': True,  # Must be True to find app templates
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',  # Required by admin
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'notifications.context_processors.unread_notifications_count',
-
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
 # ------------------------
-# Database
+# Database configuration
 # ------------------------
-DATABASES = {
-    'default': {
-        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('DB_NAME', BASE_DIR / 'db.sqlite3'),
-        'USER': os.getenv('DB_USER', ''),
-        'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'HOST': os.getenv('DB_HOST', ''),
-        'PORT': os.getenv('DB_PORT', ''),
+if os.getenv("RENDER_ENV") == "production":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # ------------------------
 # Password validation
 # ------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 # ------------------------
 # Internationalization
 # ------------------------
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "Africa/Lagos"
 USE_I18N = True
 USE_TZ = True
 
 # ------------------------
-# Static / Media
+# Static and Media
 # ------------------------
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "/static/"
+MEDIA_URL = "/media/"
+
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+MEDIA_ROOT = BASE_DIR / "mediafiles"
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# ------------------------
+# Default primary key field type
+# ------------------------
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # ------------------------
-# Authentication
+# Authentication backends
 # ------------------------
-AUTH_USER_MODEL = 'accounts.CustomUser'
-LOGIN_REDIRECT_URL = '/dashboard/'
-LOGIN_URL = '/accounts/login/'
-LOGOUT_REDIRECT_URL = '/'
-# ------------------------
-# Email
-# ------------------------
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-    EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
-    EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
-    EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', '1') == '1'
-    EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
-    EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@newsportal.com')
+AUTHENTICATION_BACKENDS = [
+    "accounts.backends.EmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # ------------------------
-# Celery
+# Email settings
 # ------------------------
-CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'django-db')
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 
 # ------------------------
-# Security settings (production)
+# Site framework (needed for sitemaps)
 # ------------------------
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_PRELOAD = True
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
+SITE_ID = 1
+
+# ------------------------
+# Donation settings
+# ------------------------
+# Your OPAY account for manual payments
+MANUAL_PAYMENT_INFO = {
+    "bank_name": "OPAY",
+    "account_number": "8039281188",
+    "account_name": "Osita Collins Ejiofor"
+}
+
+# Flutterwave secret key (from .env)
+FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")

@@ -1,0 +1,58 @@
+{% extends "core/base.html" %}
+{% block title %}Privacy Policy{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <h1 class="mb-4">Privacy Policy</h1>
+  <p>Effective Date: {{ now|date:"F d, Y" }}</p>
+
+  <p>
+    At <strong>NewsArticles</strong>, we respect your privacy and are committed to protecting your
+    personal data. This Privacy Policy explains how we collect, use, and safeguard information when
+    you access our website.
+  </p>
+
+  <h3>1. Information We Collect</h3>
+  <ul>
+    <li>Personal data you provide (name, email, account details).</li>
+    <li>Automatically collected data (IP address, browser, cookies).</li>
+    <li>Content you submit (comments, feedback, uploaded images).</li>
+  </ul>
+
+  <h3>2. How We Use Your Data</h3>
+  <ul>
+    <li>To provide and improve our services.</li>
+    <li>To communicate important updates and notifications.</li>
+    <li>To comply with legal obligations and security requirements.</li>
+  </ul>
+
+  <h3>3. Cookies & Tracking</h3>
+  <p>
+    We use cookies and similar technologies to enhance user experience and analyze traffic.
+    You may disable cookies in your browser settings, but some features may not function properly.
+  </p>
+
+  <h3>4. Data Sharing</h3>
+  <p>
+    We do not sell or rent personal information. Data may be shared only with trusted service
+    providers (e.g., hosting, analytics) or if required by law.
+  </p>
+
+  <h3>5. Data Security</h3>
+  <p>
+    We implement technical and organizational measures to protect your information.
+    However, no method of transmission over the Internet is 100% secure.
+  </p>
+
+  <h3>6. Your Rights</h3>
+  <p>
+    Depending on your jurisdiction, you may have rights to access, update, or delete your data.
+    To make such a request, please contact us at <a href="mailto:support@newsarticles.com">support@newsarticles.com</a>.
+  </p>
+
+  <h3>7. Changes to This Policy</h3>
+  <p>
+    We may update this Privacy Policy periodically. Please review it frequently to stay informed.
+  </p>
+</div>
+{% endblock %}

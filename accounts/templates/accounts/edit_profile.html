@@ -1,155 +1,180 @@
 {% extends "core/base.html" %}
 
-{% block title %}My Profile{% endblock %}
+{% block title %}Edit Profile{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-sm p-4">
+                <h3 class="text-center mb-4">Edit Profile</h3>
 
-                <h3 class="text-center mb-4">My Profile</h3>
-
-                <!-- ================== Tabs ================== -->
-                <ul class="nav nav-tabs mb-4" id="profileTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab">Profile Info</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab">Edit Profile</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">Activity</button>
-                    </li>
-                </ul>
-
-                <!-- ================== Tab Contents ================== -->
-                <div class="tab-content" id="profileTabsContent">
-
-                    <!-- ===== Profile Info ===== -->
-                    <div class="tab-pane fade show active" id="info" role="tabpanel">
-                        <div class="text-center mb-4">
-                            {% if request.user.profile_image %}
-                                <img src="{{ request.user.profile_image.url }}" class="rounded-circle" alt="Profile Picture" width="120" height="120">
-                            {% else %}
-                                <img src="https://via.placeholder.com/120" class="rounded-circle" alt="Profile Picture">
-                            {% endif %}
+                <!-- Display messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <h4 class="text-center">{{ request.user.username }}</h4>
-                        <p class="text-center text-muted">{{ request.user.email }}</p>
-                        <table class="table table-borderless mt-3">
-                            <tr>
-                                <th>Full Name:</th>
-                                <td>{{ request.user.get_full_name|default:"-" }}</td>
-                            </tr>
-                            <tr>
-                                <th>Username:</th>
-                                <td>{{ request.user.username }}</td>
-                            </tr>
-                            <tr>
-                                <th>Email:</th>
-                                <td>{{ request.user.email }}</td>
-                            </tr>
-                            <tr>
-                                <th>Status:</th>
-                                <td>
-                                    {% if request.user.is_active %}
-                                        <span class="badge bg-success">Active</span>
-                                    {% else %}
-                                        <span class="badge bg-danger">Inactive</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Joined:</th>
-                                <td>{{ request.user.date_joined|date:"M d, Y" }}</td>
-                            </tr>
-                        </table>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data" id="editProfileForm">
+                    {% csrf_token %}
+
+                    <!-- Profile Image -->
+                    <div class="mb-3 text-center">
+                        <img id="profilePreview"
+                             src="{% if request.user.profile_image %}{{ request.user.profile_image.url }}{% else %}https://via.placeholder.com/120{% endif %}"
+                             class="rounded-circle mb-2"
+                             width="120" height="120"
+                             style="object-fit: cover; border: 3px solid #ffc107; cursor: pointer;"
+                             title="Click to select a new image">
+
+                        {{ form.profile_image }}
+                        <small class="form-text text-muted">Click the image to choose a new profile picture</small>
                     </div>
 
-                    <!-- ===== Edit Profile ===== -->
-                    <div class="tab-pane fade" id="edit" role="tabpanel">
-                        <form method="POST" enctype="multipart/form-data">
-                            {% csrf_token %}
-                            <div class="mb-3 text-center">
-                                {% if request.user.profile_image %}
-                                    <img src="{{ request.user.profile_image.url }}" class="rounded-circle mb-2" alt="Profile Picture" width="120" height="120">
-                                {% else %}
-                                    <img src="https://via.placeholder.com/120" class="rounded-circle mb-2" alt="Profile Picture">
-                                {% endif %}
-                                <input type="file" name="profile_image" class="form-control mt-2">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="full_name" class="form-label">Full Name</label>
-                                <input type="text" id="full_name" name="full_name" class="form-control" value="{{ request.user.get_full_name }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" id="username" name="username" class="form-control" value="{{ request.user.username }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" id="email" name="email" class="form-control" value="{{ request.user.email }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">New Password</label>
-                                <input type="password" id="password" name="password" class="form-control" placeholder="Leave blank to keep current password">
-                            </div>
-
-                            <div class="d-grid mt-4">
-                                <button type="submit" class="btn btn-warning btn-lg">Update Profile</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- ===== Activity ===== -->
-                    <div class="tab-pane fade" id="activity" role="tabpanel">
-                        <ul class="list-group mb-3">
-                            {% if recent_articles %}
-                                {% for article in recent_articles %}
-                                <li class="list-group-item">
-                                    Published article: <strong>{{ article.title }}</strong> on {{ article.created_at|date:"M d, Y" }}
-                                </li>
-                                {% endfor %}
-                            {% endif %}
-
-                            {% if recent_comments %}
-                                {% for comment in recent_comments %}
-                                <li class="list-group-item">
-                                    Commented on "<strong>{{ comment.article.title }}</strong>": {{ comment.body|truncatechars:50 }}
-                                </li>
-                                {% endfor %}
-                            {% endif %}
-
-                            {% if recent_logins %}
-                                {% for login in recent_logins %}
-                                <li class="list-group-item">
-                                    Logged in at {{ login.timestamp|date:"M d, Y H:i" }} from IP {{ login.ip }}
-                                </li>
-                                {% endfor %}
-                            {% endif %}
-                        </ul>
-                        {% if not recent_articles and not recent_comments and not recent_logins %}
-                            <p class="text-center text-muted">No recent activity found.</p>
+                    <!-- First Name -->
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger">{{ form.first_name.errors }}</div>
                         {% endif %}
                     </div>
 
-                </div>
+                    <!-- Last Name -->
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-danger">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">New Password</label>
+                        <div class="input-group">
+                            {{ form.password }}
+                            <button type="button" class="btn btn-outline-secondary" id="togglePassword">Show</button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="text-danger">{{ form.password.errors }}</div>
+                        {% endif %}
+                        <small class="text-muted">Leave blank to keep current password</small>
+                        <div id="passwordStrength" class="mt-1"></div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-warning btn-lg">Update Profile</button>
+                        <button type="button" class="btn btn-secondary btn-lg" id="cancelChanges">Cancel Changes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Optional CSS -->
-<style>
-img.rounded-circle {
-    object-fit: cover;
-    border: 3px solid #ffc107;
-}
-</style>
+<!-- Custom JS -->
+<script>
+// Store original field values for cancel
+const form = document.getElementById("editProfileForm");
+const profileInput = document.getElementById("id_profile_image");
+const profilePreview = document.getElementById("profilePreview");
+const passwordInput = document.getElementById("id_password");
+
+const originalValues = {
+    first_name: document.getElementById("id_first_name").value,
+    last_name: document.getElementById("id_last_name").value,
+    username: document.getElementById("id_username").value,
+    email: document.getElementById("id_email").value,
+    profile_image: profilePreview.src,
+    password: ""
+};
+
+// Profile image live preview
+profilePreview.addEventListener("click", () => profileInput.click());
+profileInput.addEventListener("change", function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = e => profilePreview.src = e.target.result;
+        reader.readAsDataURL(file);
+    } else {
+        profilePreview.src = originalValues.profile_image;
+    }
+});
+
+// Password show/hide
+const togglePassword = document.getElementById("togglePassword");
+const passwordStrength = document.getElementById("passwordStrength");
+togglePassword.addEventListener("click", () => {
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+    togglePassword.textContent = type === "password" ? "Show" : "Hide";
+});
+
+// Password strength indicator
+passwordInput.addEventListener("input", () => {
+    const val = passwordInput.value;
+    let strength = "";
+    let color = "";
+
+    if (!val) {
+        strength = "";
+        color = "";
+    } else if (val.length < 6) {
+        strength = "Weak";
+        color = "red";
+    } else if (val.match(/^(?=.*[A-Za-z])(?=.*\d).{6,}$/)) {
+        strength = "Medium";
+        color = "orange";
+    } else if (val.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)) {
+        strength = "Strong";
+        color = "green";
+    } else {
+        strength = "Medium";
+        color = "orange";
+    }
+
+    passwordStrength.textContent = strength ? `Strength: ${strength}` : "";
+    passwordStrength.style.color = color;
+});
+
+// Cancel changes functionality (fully restores profile image)
+document.getElementById("cancelChanges").addEventListener("click", () => {
+    document.getElementById("id_first_name").value = originalValues.first_name;
+    document.getElementById("id_last_name").value = originalValues.last_name;
+    document.getElementById("id_username").value = originalValues.username;
+    document.getElementById("id_email").value = originalValues.email;
+
+    // Restore original profile image
+    profilePreview.src = originalValues.profile_image;
+    profileInput.value = ""; // clear file input
+
+    passwordInput.value = ""; // clear password
+    passwordStrength.textContent = "";
+});
+</script>
 
 {% endblock %}

@@ -1,0 +1,61 @@
+{% load humanize %}
+
+<div class="card mb-3 comment-item" id="comment-{{ comment.id }}">
+  <div class="card-body">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center">
+      <h6 class="card-subtitle text-muted">
+        {{ comment.user.username }} • {{ comment.created_at|naturaltime }}
+      </h6>
+      <div>
+        {% if request.user == comment.user %}
+          <button class="btn btn-sm btn-outline-secondary" onclick="toggleEdit({{ comment.id }})">Edit</button>
+        {% endif %}
+        {% if request.user.is_authenticated %}
+          <button class="btn btn-sm btn-outline-primary" onclick="toggleReply({{ comment.id }})">Reply</button>
+          <button class="btn btn-sm btn-outline-success" onclick="toggleLike({{ comment.id }})">
+            Like (<span id="like-count-{{ comment.id }}">{{ comment.like_count }}</span>)
+          </button>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Content -->
+    <p class="mt-2" id="comment-content-{{ comment.id }}">{{ comment.content|safe }}</p>
+
+    <!-- Edit Form -->
+    <div class="edit-form mt-2 d-none" id="edit-form-{{ comment.id }}">
+      <form class="edit-comment-form" data-comment="{{ comment.id }}">
+        {% csrf_token %}
+        <textarea name="content" class="form-control mb-2" rows="2">{{ comment.content }}</textarea>
+        <button type="submit" class="btn btn-sm btn-warning">Save</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEdit({{ comment.id }})">Cancel</button>
+      </form>
+    </div>
+
+    <!-- Reply Form -->
+    <div class="reply-form mt-2 d-none" id="reply-form-{{ comment.id }}">
+      <form class="reply-comment-form" data-comment="{{ comment.id }}">
+        {% csrf_token %}
+        <textarea name="content" class="form-control mb-2" rows="2" placeholder="Write a reply..."></textarea>
+        <button type="submit" class="btn btn-sm btn-success">Reply</button>
+      </form>
+    </div>
+
+    <!-- Nested Replies -->
+    {% if comment.children.exists %}
+      <button class="btn btn-link btn-sm mt-2" 
+              type="button" 
+              onclick="toggleReplies({{ comment.id }})"
+              id="replies-toggle-{{ comment.id }}">
+        View {{ comment.children.count }} replies ▼
+      </button>
+
+      <div class="replies ms-4 mt-2 d-none" id="replies-{{ comment.id }}">
+        {% for reply in comment.children.all %}
+          {% include "comments/comment_item.html" with comment=reply %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>

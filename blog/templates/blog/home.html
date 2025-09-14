@@ -37,7 +37,7 @@
                                 {% endif %}
                                 <div class="card-body d-flex flex-column">
                                     <h5 class="card-title">
-                                        <a href="{% url 'blog:post_detail' post.slug %}" class="text-dark text-decoration-none">
+                                        <a href="{% url 'blog:article_detail' post.slug %}" class="text-dark text-decoration-none">
                                             {{ post.title|highlight:query|safe }}
                                         </a>
                                     </h5>
@@ -45,7 +45,7 @@
                                         {{ post.content|truncatewords:25|highlight:query|safe }}
                                     </p>
                                     <div class="mt-auto">
-                                        <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-outline-primary btn-sm">Read More</a>
+                                        <a href="{% url 'blog:article_detail' post.slug %}" class="btn btn-outline-primary btn-sm">Read More</a>
                                     </div>
                                 </div>
                                 <div class="card-footer bg-white text-muted small">
@@ -129,7 +129,7 @@
                     <ul class="list-unstyled mb-0">
                         {% for recent in recent_posts %}
                             <li>
-                                <a href="{% url 'blog:post_detail' recent.slug %}" class="text-decoration-none">
+                                <a href="{% url 'blog:article_detail' recent.slug %}" class="text-decoration-none">
                                     {{ recent.title|highlight:query|safe }}
                                 </a>
                             </li>
