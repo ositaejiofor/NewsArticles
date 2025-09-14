@@ -13,11 +13,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 # ------------------------
+# Environment
+# ------------------------
+RENDER_ENV = os.getenv("RENDER_ENV", "development")  # 'production' or 'development'
+DEBUG = os.getenv("DEBUG", "False") == "True" if RENDER_ENV == "production" else True
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# ------------------------
 # Security
 # ------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-placeholder")
-DEBUG = os.getenv("DEBUG", "True") == "True"
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+# HTTPS settings for production
+if RENDER_ENV == "production":
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 # ------------------------
 # Custom user model
@@ -93,12 +107,7 @@ CKEDITOR_CONFIGS = {
             ["Image", "CodeSnippet", "Embed", "Table"],
             ["RemoveFormat", "Source"],
         ],
-        "extraPlugins": ",".join([
-            "uploadimage",
-            "codesnippet",
-            "embed",
-            "autolink",
-        ]),
+        "extraPlugins": ",".join(["uploadimage", "codesnippet", "embed", "autolink"]),
         "codeSnippet_theme": "monokai_sublime",
     }
 }
@@ -129,9 +138,9 @@ TEMPLATES = [
 ]
 
 # ------------------------
-# Database configuration
+# Database
 # ------------------------
-if os.getenv("RENDER_ENV") == "production":
+if RENDER_ENV == "production":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -169,19 +178,17 @@ USE_I18N = True
 USE_TZ = True
 
 # ------------------------
-# Static and Media
+# Static & Media
 # ------------------------
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
-
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ------------------------
-# Default primary key field type
+# Default primary key
 # ------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -194,7 +201,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # ------------------------
-# Email settings
+# Email
 # ------------------------
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
@@ -208,19 +215,16 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 
 # ------------------------
-# Site framework (needed for sitemaps)
+# Site framework
 # ------------------------
 SITE_ID = 1
 
 # ------------------------
 # Donation settings
 # ------------------------
-# Your OPAY account for manual payments
 MANUAL_PAYMENT_INFO = {
     "bank_name": "OPAY",
     "account_number": "8039281188",
     "account_name": "Osita Collins Ejiofor"
 }
-
-# Flutterwave secret key (from .env)
 FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")
