@@ -16,15 +16,14 @@ load_dotenv(BASE_DIR / ".env")
 # Environment
 # ------------------------
 RENDER_ENV = os.getenv("RENDER_ENV", "development")  # 'production' or 'development'
-DEBUG = os.getenv("DEBUG", "False") == "True" if RENDER_ENV == "production" else True
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes") if RENDER_ENV == "production" else True
+ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")]
 
 # ------------------------
 # Security
 # ------------------------
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-placeholder")
 
-# HTTPS settings for production
 if RENDER_ENV == "production":
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
