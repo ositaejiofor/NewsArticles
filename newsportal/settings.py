@@ -31,7 +31,7 @@ DEBUG = (
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 custom_hosts = os.getenv("ALLOWED_HOSTS", "")
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["www.eaglecollins.onrender.com", "localhost", "127.0.0.1"]
 if RENDER_ENV == "production":
     ALLOWED_HOSTS.append("eaglecollins.onrender.com")
     if render_host:
