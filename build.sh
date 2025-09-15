@@ -1,25 +1,22 @@
 #!/usr/bin/env bash
-# Exit immediately if a command exits with a non-zero status
-set -o errexit
+# Exit on error
+set -o errexit  
 
-echo "🔧 Installing dependencies..."
+# Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-echo "🗃️ Running migrations..."
+# Run migrations and collect static files
 python manage.py migrate --noinput
-
-echo "📦 Collecting static files..."
 python manage.py collectstatic --noinput
 
-# Check if all superuser env vars are set before creating superuser
-if [[ -n "$DJANGO_SUPERUSER_USERNAME" && -n "$DJANGO_SUPERUSER_EMAIL" && -n "$DJANGO_SUPERUSER_PASSWORD" ]]; then
-  echo "👤 Creating superuser..."
-  python manage.py createsuperuser \
-    --noinput \
-    --username "$DJANGO_SUPERUSER_USERNAME" \
-    --email "$DJANGO_SUPERUSER_EMAIL" || true
-else
-  echo "⚠️ Skipping superuser creation (missing DJANGO_SUPERUSER_* env vars)"
-fi
-
-echo "✅ Build script completed!"
+# Create superuser if it doesn’t already exist
+python manage.py shell <<EOF
+from django.contrib.auth import get_user_model
+User = get_user_model()
+username = "$DJANGO_SUPERUSER_USERNAME"
+email = "$DJANGO_SUPERUSER_EMAIL"
+password = "$DJANGO_SUPERUSER_PASSWORD"
+if username and password and not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username=username, email=email, password=password)
+EOF

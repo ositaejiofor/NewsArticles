@@ -14,10 +14,12 @@ services:
         fromDatabase:
           name: newsportal-db
           property: connectionString
-      # Superuser credentials must be added manually in Render Dashboard:
-      # DJANGO_SUPERUSER_USERNAME
-      # DJANGO_SUPERUSER_EMAIL
-      # DJANGO_SUPERUSER_PASSWORD
+
+      # Superuser credentials - set these manually in Render dashboard (not in GitHub!)
+      - key: DJANGO_SUPERUSER_USERNAME
+      - key: DJANGO_SUPERUSER_EMAIL
+      - key: DJANGO_SUPERUSER_PASSWORD
+
 databases:
   - name: newsportal-db
     plan: free
