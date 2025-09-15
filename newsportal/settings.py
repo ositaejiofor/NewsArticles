@@ -1,3 +1,5 @@
+# settings.py
+
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -29,17 +31,14 @@ DEBUG = (
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 custom_hosts = os.getenv("ALLOWED_HOSTS", "")
 
-# Start with localhost for dev
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-
 if RENDER_ENV == "production":
-    ALLOWED_HOSTS.append("eaglecollins.onrender.com")  # your Render domain
+    ALLOWED_HOSTS.append("eaglecollins.onrender.com")
     if render_host:
         ALLOWED_HOSTS.append(render_host)
     if custom_hosts:
         ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
 
-# Remove duplicates
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 # ------------------------
@@ -79,7 +78,6 @@ CSRF_TRUSTED_ORIGINS = csrf_default
 # Flutterwave Secret Key
 # ------------------------
 FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")
-# Add this in Render dashboard → Environment → FLW_SECRET_KEY=<your-flutterwave-key>
 
 # ------------------------
 # Database
@@ -208,6 +206,28 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = BASE_DIR / "mediafiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# ------------------------
+# CKEditor
+# ------------------------
+CKEDITOR_UPLOAD_PATH = "uploads/articles/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_CONFIGS = {
+    "default": {
+        "toolbar": "Custom",
+        "height": 400,
+        "width": "100%",
+        "toolbar_Custom": [
+            ["Bold", "Italic", "Underline", "Strike"],
+            ["NumberedList", "BulletedList", "Blockquote"],
+            ["Link", "Unlink"],
+            ["Image", "CodeSnippet", "Embed", "Table"],
+            ["RemoveFormat", "Source"],
+        ],
+        "extraPlugins": ",".join(["uploadimage", "codesnippet", "embed", "autolink"]),
+        "codeSnippet_theme": "monokai_sublime",
+    }
+}
 
 # ------------------------
 # Email
