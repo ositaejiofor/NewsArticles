@@ -8,3 +8,4 @@ django-ckeditor
 crispy-bootstrap5
 django-crispy-forms
 python-dateutil
+requests>=2.31.0

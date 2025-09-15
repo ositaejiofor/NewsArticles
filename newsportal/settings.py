@@ -35,7 +35,7 @@ if RENDER_ENV == "production":
     if custom_hosts:
         ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
 else:
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+    ALLOWED_HOSTS = ["eaglecollins.onrender.com", "localhost", "127.0.0.1"]
     if custom_hosts:
         ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
 
