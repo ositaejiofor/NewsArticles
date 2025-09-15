@@ -17,7 +17,20 @@ load_dotenv(BASE_DIR / ".env")
 # ------------------------
 RENDER_ENV = os.getenv("RENDER_ENV", "development")  # 'production' or 'development'
 DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes") if RENDER_ENV == "production" else True
-ALLOWED_HOSTS = [host.strip() for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")]
+
+# ------------------------
+# Hosts
+# ------------------------
+render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
+custom_hosts = os.getenv("ALLOWED_HOSTS", "")
+
+ALLOWED_HOSTS = []
+if render_host:
+    ALLOWED_HOSTS.append(render_host)
+if custom_hosts:
+    ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
+if RENDER_ENV != "production":
+    ALLOWED_HOSTS.extend(["localhost", "127.0.0.1"])
 
 # ------------------------
 # Security
@@ -31,6 +44,36 @@ if RENDER_ENV == "production":
     SECURE_HSTS_SECONDS = 31536000  # 1 year
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+else:
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+
+# ------------------------
+# CSRF trusted origins
+# ------------------------
+csrf_default = []
+
+# Always trust Render domains
+csrf_default.append("https://*.onrender.com")
+
+# Add Render’s actual hostname if present
+if render_host:
+    csrf_default.append(f"https://{render_host}")
+
+# Add custom domains from ALLOWED_HOSTS
+if custom_hosts:
+    for h in [h.strip() for h in custom_hosts.split(",") if h.strip()]:
+        csrf_default.append(f"https://{h}")
+
+# Local development
+if RENDER_ENV != "production":
+    for local in ["localhost", "127.0.0.1"]:
+        csrf_default.append(f"http://{local}:8000")
+        csrf_default.append(f"https://{local}:8000")
+
+CSRF_TRUSTED_ORIGINS = csrf_default
 
 # ------------------------
 # Custom user model
