@@ -1,44 +1,23 @@
-# render.yaml
-# =======================================
-# Render Blueprint for Django + Postgres
-# =======================================
-
 services:
   - type: web
-    name: newsportal-web
+    name: newsportal
     env: python
-    plan: free                     # or starter/standard depending on your needs
-    buildCommand: "./build.sh"     # we'll create this script below
-    startCommand: "gunicorn newsportal.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --threads 2 --timeout 120"
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn newsportal.wsgi:application --workers=4 --bind=0.0.0.0:$PORT
     envVars:
-      - key: RENDER_ENV
-        value: production
       - key: SECRET_KEY
         generateValue: true
-      - key: DEBUG
-        value: false
-      - key: ALLOWED_HOSTS
-        value: www.example.com,example.com   # add your custom domains if any
-      - key: EMAIL_BACKEND
-        value: django.core.mail.backends.smtp.EmailBackend
-      - key: EMAIL_HOST
-        sync: false   # set in dashboard
-      - key: EMAIL_PORT
-        value: 587
-      - key: EMAIL_HOST_USER
-        sync: false   # set in dashboard
-      - key: EMAIL_HOST_PASSWORD
-        sync: false   # set in dashboard
-      - key: EMAIL_USE_TLS
-        value: true
-      - key: EMAIL_USE_SSL
-        value: false
-      - key: FLW_SECRET_KEY
-        sync: false   # your Flutterwave production key
-
+      - key: RENDER_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: newsportal-db
+          property: connectionString
+      # Superuser credentials must be added manually in Render Dashboard:
+      # DJANGO_SUPERUSER_USERNAME
+      # DJANGO_SUPERUSER_EMAIL
+      # DJANGO_SUPERUSER_PASSWORD
 databases:
   - name: newsportal-db
-    databaseName: newsportal
-    user: newsportal_user
-    plan: free          # or starter/standard if you need more
-
+    plan: free
