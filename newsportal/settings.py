@@ -30,7 +30,7 @@ render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 custom_hosts = os.getenv("ALLOWED_HOSTS", "")
 
 if RENDER_ENV == "production":
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['eaglecollins.onrender.com', 'localhost', '127.0.0.1']
     if render_host:
         ALLOWED_HOSTS.append(render_host)
     if custom_hosts:
