@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # ------------------------
 # Base directory
@@ -35,7 +36,7 @@ if RENDER_ENV == "production":
     if custom_hosts:
         ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
 else:
-    ALLOWED_HOSTS = ["eaglecollins.onrender.com", "localhost", "127.0.0.1"]
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
     if custom_hosts:
         ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
 
@@ -127,6 +128,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 # ------------------------
@@ -180,7 +182,6 @@ TEMPLATES = [
 # Database
 # ------------------------
 if RENDER_ENV == "production" and os.getenv("DATABASE_URL"):
-    import dj_database_url
     DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
 else:
     DATABASES = {
@@ -251,7 +252,7 @@ EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False") == "True"
 SITE_ID = 1
 
 # ------------------------
-# Donation settings
+# Donations
 # ------------------------
 MANUAL_PAYMENT_INFO = {
     "bank_name": "OPAY",

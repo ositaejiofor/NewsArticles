@@ -1,60 +1,28 @@
-# ===============================
-# Render service configuration
-# ===============================
 services:
   - type: web
-    name: newsportal-web
+    name: newsportal
     env: python
-    buildCommand: bash build.sh
-    startCommand: gunicorn newsportal.wsgi:application --bind 0.0.0.0:$PORT
-    autoDeploy: true
+    region: oregon
+    branch: main
+    plan: free
+    buildCommand: bash ./build.sh
+    startCommand: bash ./start.sh
     envVars:
-      # ------------------------
-      # Django environment
-      # ------------------------
-      - key: RENDER_ENV
-        value: "production"
-      - key: DEBUG
-        value: "False"
       - key: SECRET_KEY
-        fromDatabase: false
-        value: "replace-with-your-production-secret"
-
-      # ------------------------
-      # Superuser credentials
-      # ------------------------
-      - key: DJANGO_SUPERUSER_USERNAME
-        value: "admin"
-      - key: DJANGO_SUPERUSER_EMAIL
-        value: "admin@example.com"
-      - key: DJANGO_SUPERUSER_PASSWORD
-        value: "strongpassword123"
-
-      # ------------------------
-      # Optional custom host(s)
-      # ------------------------
+        value: replace_with_your_secret_key
+      - key: DEBUG
+        value: 'False'
       - key: ALLOWED_HOSTS
-        value: "www.yourdomain.com"
-
-      # ------------------------
-      # Email (optional, adjust if needed)
-      # ------------------------
-      - key: EMAIL_BACKEND
-        value: "django.core.mail.backends.smtp.EmailBackend"
-      - key: EMAIL_HOST
-        value: "smtp.yourprovider.com"
-      - key: EMAIL_PORT
-        value: "587"
-      - key: EMAIL_HOST_USER
-        value: "you@yourdomain.com"
-      - key: EMAIL_HOST_PASSWORD
-        value: "emailpassword"
-      - key: EMAIL_USE_TLS
-        value: "True"
-      - key: EMAIL_USE_SSL
-        value: "False"
-
-  - type: postgresql
-    name: newsportal-db
-    plan: starter # adjust plan as needed
-    # Render automatically sets DATABASE_URL environment variable
+        value: yourdomain.com,www.yourdomain.com
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: youremail@example.com
+      - key: DJANGO_SUPERUSER_PASSWORD
+        value: StrongPassword123
+      - key: FLUTTERWAVE_SECRET_KEY
+        value: replace_with_flutterwave_key
+      - key: SENDGRID_API_KEY
+        value: replace_with_sendgrid_key
+      - key: DATABASE_URL
+        fromDatabase: true

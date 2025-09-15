@@ -1,7 +1,10 @@
 Django>=5.2,<6.0
 gunicorn
+uvicorn
+djangorestframework
 psycopg2-binary
 whitenoise
+waitress
 python-dotenv
 dj-database-url
 django-ckeditor
