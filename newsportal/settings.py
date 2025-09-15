@@ -18,7 +18,7 @@ load_dotenv(BASE_DIR / ".env")
 # ------------------------
 # Environment
 # ------------------------
-RENDER_ENV = os.getenv("RENDER_ENV", "development")  # 'production' or 'development'
+RENDER_ENV = os.getenv("RENDER_ENV", "development")  # "production" or "development"
 DEBUG = (
     os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
     if RENDER_ENV == "production"
@@ -26,19 +26,21 @@ DEBUG = (
 )
 
 # ------------------------
-# Hosts (bulletproof)
+# Hosts
 # ------------------------
-render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
-custom_hosts = os.getenv("ALLOWED_HOSTS", "")
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
-ALLOWED_HOSTS = ["www.eaglecollins.onrender.com", "localhost", "127.0.0.1"]
 if RENDER_ENV == "production":
-    ALLOWED_HOSTS.append("eaglecollins.onrender.com")
+    ALLOWED_HOSTS += [
+        "eaglecollins.onrender.com",
+        "www.eaglecollins.onrender.com",
+    ]
+    render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
     if render_host:
         ALLOWED_HOSTS.append(render_host)
+    custom_hosts = os.getenv("ALLOWED_HOSTS", "")
     if custom_hosts:
-        ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
-
+        ALLOWED_HOSTS += [h.strip() for h in custom_hosts.split(",") if h.strip()]
 ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 # ------------------------
@@ -62,17 +64,19 @@ else:
 # ------------------------
 # CSRF trusted origins
 # ------------------------
-csrf_default = ["https://*.onrender.com"]
-if render_host:
-    csrf_default.append(f"https://{render_host}")
-if custom_hosts:
-    for h in [h.strip() for h in custom_hosts.split(",") if h.strip()]:
-        csrf_default.append(f"https://{h}")
-if RENDER_ENV != "production":
-    for local in ["localhost", "127.0.0.1", "0.0.0.0"]:
-        csrf_default.append(f"http://{local}:8000")
-        csrf_default.append(f"https://{local}:8000")
-CSRF_TRUSTED_ORIGINS = csrf_default
+csrf_origins = [f"https://*.onrender.com"]
+if RENDER_ENV == "production":
+    if render_host:
+        csrf_origins.append(f"https://{render_host}")
+    if custom_hosts:
+        for h in [h.strip() for h in custom_hosts.split(",") if h.strip()]:
+            csrf_origins.append(f"https://{h}")
+else:
+    for host in ["localhost", "127.0.0.1", "0.0.0.0"]:
+        csrf_origins.append(f"http://{host}:8000")
+        csrf_origins.append(f"https://{host}:8000")
+
+CSRF_TRUSTED_ORIGINS = csrf_origins
 
 # ------------------------
 # Flutterwave Secret Key
@@ -83,7 +87,9 @@ FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")
 # Database
 # ------------------------
 if RENDER_ENV == "production" and os.getenv("DATABASE_URL"):
-    DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
+    DATABASES = {
+        "default": dj_database_url.config(conn_max_age=600, ssl_require=True)
+    }
 else:
     DATABASES = {
         "default": {
@@ -165,8 +171,8 @@ TEMPLATES = [
 # ------------------------
 # URLs & WSGI
 # ------------------------
-ROOT_URLCONF = "newsportal.urls"
-WSGI_APPLICATION = "newsportal.wsgi.application"
+ROOT_URLCONF = "newsportal.urls"  # <-- replace with your project name
+WSGI_APPLICATION = "newsportal.wsgi.application"  # <-- replace with your project name
 
 # ------------------------
 # Authentication
