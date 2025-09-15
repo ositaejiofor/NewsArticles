@@ -48,7 +48,7 @@ if RENDER_ENV == "production":
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -60,26 +60,16 @@ else:
 # ------------------------
 # CSRF trusted origins
 # ------------------------
-csrf_default = []
-
-# Always trust Render domains
-csrf_default.append("https://*.onrender.com")
-
-# Add Render’s actual hostname if present
+csrf_default = ["https://*.onrender.com"]
 if render_host:
     csrf_default.append(f"https://{render_host}")
-
-# Add custom domains
 if custom_hosts:
     for h in [h.strip() for h in custom_hosts.split(",") if h.strip()]:
         csrf_default.append(f"https://{h}")
-
-# Local development
 if RENDER_ENV != "production":
     for local in ["localhost", "127.0.0.1", "0.0.0.0"]:
         csrf_default.append(f"http://{local}:8000")
         csrf_default.append(f"https://{local}:8000")
-
 CSRF_TRUSTED_ORIGINS = csrf_default
 
 # ------------------------
@@ -140,7 +130,7 @@ MIDDLEWARE = [
 ]
 
 # ------------------------
-# CKEditor settings
+# CKEditor
 # ------------------------
 CKEDITOR_UPLOAD_PATH = "uploads/articles/"
 CKEDITOR_IMAGE_BACKEND = "pillow"
@@ -189,17 +179,9 @@ TEMPLATES = [
 # ------------------------
 # Database
 # ------------------------
-if RENDER_ENV == "production":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST"),
-            "PORT": os.getenv("DB_PORT", "5432"),
-        }
-    }
+if RENDER_ENV == "production" and os.getenv("DATABASE_URL"):
+    import dj_database_url
+    DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
 else:
     DATABASES = {
         "default": {

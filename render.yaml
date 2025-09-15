@@ -1,19 +1,60 @@
+# ===============================
+# Render service configuration
+# ===============================
 services:
   - type: web
     name: newsportal-web
     env: python
-    plan: starter
-    region: oregon
     buildCommand: bash build.sh
     startCommand: gunicorn newsportal.wsgi:application --bind 0.0.0.0:$PORT
+    autoDeploy: true
     envVars:
-      - key: SECRET_KEY
-        fromDatabase: true
+      # ------------------------
+      # Django environment
+      # ------------------------
+      - key: RENDER_ENV
+        value: "production"
       - key: DEBUG
-        value: 'False'
-      - key: DJANGO_SUPERUSER_EMAIL
-        value: admin@example.com
+        value: "False"
+      - key: SECRET_KEY
+        fromDatabase: false
+        value: "replace-with-your-production-secret"
+
+      # ------------------------
+      # Superuser credentials
+      # ------------------------
       - key: DJANGO_SUPERUSER_USERNAME
-        value: admin
+        value: "admin"
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: "admin@example.com"
       - key: DJANGO_SUPERUSER_PASSWORD
-        fromDatabase: true
+        value: "strongpassword123"
+
+      # ------------------------
+      # Optional custom host(s)
+      # ------------------------
+      - key: ALLOWED_HOSTS
+        value: "www.yourdomain.com"
+
+      # ------------------------
+      # Email (optional, adjust if needed)
+      # ------------------------
+      - key: EMAIL_BACKEND
+        value: "django.core.mail.backends.smtp.EmailBackend"
+      - key: EMAIL_HOST
+        value: "smtp.yourprovider.com"
+      - key: EMAIL_PORT
+        value: "587"
+      - key: EMAIL_HOST_USER
+        value: "you@yourdomain.com"
+      - key: EMAIL_HOST_PASSWORD
+        value: "emailpassword"
+      - key: EMAIL_USE_TLS
+        value: "True"
+      - key: EMAIL_USE_SSL
+        value: "False"
+
+  - type: postgresql
+    name: newsportal-db
+    plan: starter # adjust plan as needed
+    # Render automatically sets DATABASE_URL environment variable
