@@ -24,21 +24,23 @@ DEBUG = (
 )
 
 # ------------------------
-# Hosts
+# Hosts (bulletproof)
 # ------------------------
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 custom_hosts = os.getenv("ALLOWED_HOSTS", "")
 
+# Start with localhost for dev
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
 if RENDER_ENV == "production":
-    ALLOWED_HOSTS = ['eaglecollins.onrender.com', 'localhost', '127.0.0.1']
+    ALLOWED_HOSTS.append("eaglecollins.onrender.com")  # your Render domain
     if render_host:
         ALLOWED_HOSTS.append(render_host)
     if custom_hosts:
         ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
-else:
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-    if custom_hosts:
-        ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
+
+# Remove duplicates
+ALLOWED_HOSTS = list(set(ALLOWED_HOSTS))
 
 # ------------------------
 # Security
@@ -74,10 +76,23 @@ if RENDER_ENV != "production":
 CSRF_TRUSTED_ORIGINS = csrf_default
 
 # ------------------------
-# Custom user model
+# Flutterwave Secret Key
 # ------------------------
-AUTH_USER_MODEL = "accounts.CustomUser"
-LOGIN_REDIRECT_URL = "profile"
+FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")
+# Add this in Render dashboard → Environment → FLW_SECRET_KEY=<your-flutterwave-key>
+
+# ------------------------
+# Database
+# ------------------------
+if RENDER_ENV == "production" and os.getenv("DATABASE_URL"):
+    DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # ------------------------
 # Installed apps
@@ -128,36 +143,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
-
-# ------------------------
-# CKEditor
-# ------------------------
-CKEDITOR_UPLOAD_PATH = "uploads/articles/"
-CKEDITOR_IMAGE_BACKEND = "pillow"
-CKEDITOR_CONFIGS = {
-    "default": {
-        "toolbar": "Custom",
-        "height": 400,
-        "width": "100%",
-        "toolbar_Custom": [
-            ["Bold", "Italic", "Underline", "Strike"],
-            ["NumberedList", "BulletedList", "Blockquote"],
-            ["Link", "Unlink"],
-            ["Image", "CodeSnippet", "Embed", "Table"],
-            ["RemoveFormat", "Source"],
-        ],
-        "extraPlugins": ",".join(["uploadimage", "codesnippet", "embed", "autolink"]),
-        "codeSnippet_theme": "monokai_sublime",
-    }
-}
-
-# ------------------------
-# URLs and WSGI
-# ------------------------
-ROOT_URLCONF = "newsportal.urls"
-WSGI_APPLICATION = "newsportal.wsgi.application"
 
 # ------------------------
 # Templates
@@ -179,17 +165,21 @@ TEMPLATES = [
 ]
 
 # ------------------------
-# Database
+# URLs & WSGI
 # ------------------------
-if RENDER_ENV == "production" and os.getenv("DATABASE_URL"):
-    DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+ROOT_URLCONF = "newsportal.urls"
+WSGI_APPLICATION = "newsportal.wsgi.application"
+
+# ------------------------
+# Authentication
+# ------------------------
+AUTH_USER_MODEL = "accounts.CustomUser"
+LOGIN_REDIRECT_URL = "profile"
+
+AUTHENTICATION_BACKENDS = [
+    "accounts.backends.EmailBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # ------------------------
 # Password validation
@@ -220,19 +210,6 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ------------------------
-# Default primary key
-# ------------------------
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# ------------------------
-# Authentication backends
-# ------------------------
-AUTHENTICATION_BACKENDS = [
-    "accounts.backends.EmailBackend",
-    "django.contrib.auth.backends.ModelBackend",
-]
-
-# ------------------------
 # Email
 # ------------------------
 EMAIL_BACKEND = os.getenv(
@@ -259,4 +236,3 @@ MANUAL_PAYMENT_INFO = {
     "account_number": "8039281188",
     "account_name": "Osita Collins Ejiofor",
 }
-FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")

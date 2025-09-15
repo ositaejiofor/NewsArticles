@@ -1,28 +1,32 @@
+# ------------------------
+# Render service configuration
+# ------------------------
 services:
   - type: web
-    name: newsportal
+    name: NewsArticles
     env: python
-    region: oregon
-    branch: main
-    plan: free
-    buildCommand: bash ./build.sh
-    startCommand: bash ./start.sh
+    plan: free  # change to standard if needed
+    region: oregon  # or choose your preferred region
+    buildCommand: bash build.sh
+    startCommand: gunicorn newsportal.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
+      - key: RENDER_ENV
+        value: production
       - key: SECRET_KEY
-        value: replace_with_your_secret_key
-      - key: DEBUG
-        value: 'False'
-      - key: ALLOWED_HOSTS
-        value: yourdomain.com,www.yourdomain.com
+        value: django-insecure-3f!8y@v$k#r2z%1m7b&d3o8h!s6p@e#q4j+1w^u%t!n7l&f
+      - key: FLW_SECRET_KEY
+        value: <your-flutterwave-secret-key>
       - key: DJANGO_SUPERUSER_USERNAME
         value: admin
       - key: DJANGO_SUPERUSER_EMAIL
-        value: youremail@example.com
+        value: admin@example.com
       - key: DJANGO_SUPERUSER_PASSWORD
         value: StrongPassword123
-      - key: FLUTTERWAVE_SECRET_KEY
-        value: replace_with_flutterwave_key
-      - key: SENDGRID_API_KEY
-        value: replace_with_sendgrid_key
       - key: DATABASE_URL
-        fromDatabase: true
+        value: <your-prod-db-url>  # optional if using Postgres
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: eaglecollins.onrender.com
+    autoDeploy: true
+    repo: https://github.com/ositaejiofor/NewsArticles
