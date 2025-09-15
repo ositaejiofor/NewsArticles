@@ -7,3 +7,4 @@ dj-database-url
 django-ckeditor
 crispy-bootstrap5
 django-crispy-forms
+python-dateutil
