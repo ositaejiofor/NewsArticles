@@ -16,7 +16,11 @@ load_dotenv(BASE_DIR / ".env")
 # Environment
 # ------------------------
 RENDER_ENV = os.getenv("RENDER_ENV", "development")  # 'production' or 'development'
-DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes") if RENDER_ENV == "production" else True
+DEBUG = (
+    os.getenv("DEBUG", "False").lower() in ("true", "1", "yes")
+    if RENDER_ENV == "production"
+    else True
+)
 
 # ------------------------
 # Hosts
@@ -24,13 +28,16 @@ DEBUG = os.getenv("DEBUG", "False").lower() in ("true", "1", "yes") if RENDER_EN
 render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
 custom_hosts = os.getenv("ALLOWED_HOSTS", "")
 
-ALLOWED_HOSTS = []
-if render_host:
-    ALLOWED_HOSTS.append(render_host)
-if custom_hosts:
-    ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
-if RENDER_ENV != "production":
-    ALLOWED_HOSTS.extend(["localhost", "127.0.0.1"])
+if RENDER_ENV == "production":
+    ALLOWED_HOSTS = []
+    if render_host:
+        ALLOWED_HOSTS.append(render_host)
+    if custom_hosts:
+        ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
+else:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+    if custom_hosts:
+        ALLOWED_HOSTS.extend([h.strip() for h in custom_hosts.split(",") if h.strip()])
 
 # ------------------------
 # Security
@@ -62,14 +69,14 @@ csrf_default.append("https://*.onrender.com")
 if render_host:
     csrf_default.append(f"https://{render_host}")
 
-# Add custom domains from ALLOWED_HOSTS
+# Add custom domains
 if custom_hosts:
     for h in [h.strip() for h in custom_hosts.split(",") if h.strip()]:
         csrf_default.append(f"https://{h}")
 
 # Local development
 if RENDER_ENV != "production":
-    for local in ["localhost", "127.0.0.1"]:
+    for local in ["localhost", "127.0.0.1", "0.0.0.0"]:
         csrf_default.append(f"http://{local}:8000")
         csrf_default.append(f"https://{local}:8000")
 
@@ -247,7 +254,7 @@ AUTHENTICATION_BACKENDS = [
 # ------------------------
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
-    "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend"
+    "django.core.mail.backends.console.EmailBackend" if DEBUG else "django.core.mail.backends.smtp.EmailBackend",
 )
 EMAIL_HOST = os.getenv("EMAIL_HOST", "")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
@@ -267,6 +274,6 @@ SITE_ID = 1
 MANUAL_PAYMENT_INFO = {
     "bank_name": "OPAY",
     "account_number": "8039281188",
-    "account_name": "Osita Collins Ejiofor"
+    "account_name": "Osita Collins Ejiofor",
 }
 FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")
