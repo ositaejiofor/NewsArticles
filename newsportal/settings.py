@@ -28,7 +28,7 @@ DEBUG = (
 # ------------------------
 # Hosts
 # ------------------------
-ALLOWED_HOSTS = ["www.eaglecollins.onrender.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["https://www.eaglecollins.onrender.com", "localhost", "127.0.0.1"]
 
 if RENDER_ENV == "production":
     ALLOWED_HOSTS += [
