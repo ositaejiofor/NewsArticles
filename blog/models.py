@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.conf import settings
-from ckeditor_uploader.fields import RichTextUploadingField
+from django_ckeditor_5.fields import CKEditor5Field
 from django.urls import reverse
 
 
@@ -41,7 +41,7 @@ class Article(models.Model):
         blank=True,
         help_text="Short summary or excerpt of the article"
     )
-    content = RichTextUploadingField()
+    content = CKEditor5Field(config_name="default")
     image = models.ImageField(upload_to="blog_images/", blank=True, null=True)
     category = models.ForeignKey(
         Category,

@@ -45,7 +45,8 @@ urlpatterns = [
     path('adminpanel/', include('adminpanel.urls')),
 
     # CKEditor
-    path("ckeditor/", include("ckeditor_uploader.urls")),
+    path("ckeditor5/", include('django_ckeditor_5.urls')),
+
 
     # Legal pages
     path("privacy-policy/", core_views.privacy_policy, name="privacy_policy"),

@@ -2,7 +2,7 @@
 from django.db import models
 from django.conf import settings
 from blog.models import Article
-from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 from django.contrib.auth import get_user_model
 
 
@@ -30,7 +30,7 @@ class Comment(models.Model):
         blank=True,
         related_name="replies"
     )
-    content = RichTextField(config_name="default")
+    content =  CKEditor5Field(config_name="default")
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,

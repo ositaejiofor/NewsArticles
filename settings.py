@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
+import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 # ------------------------
 # Base directory
@@ -28,13 +30,13 @@ DEBUG = (
 # ------------------------
 # Hosts
 # ------------------------
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'eaglecollins.onrender.com', 'www.eaglecollins.onrender.com']
-
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "eaglecollins.onrender.com",
+    "www.eaglecollins.onrender.com",
+]
 if RENDER_ENV == "production":
-    ALLOWED_HOSTS += [
-        "eaglecollins.onrender.com",
-        "www.eaglecollins.onrender.com",
-    ]
     render_host = os.getenv("RENDER_EXTERNAL_HOSTNAME")
     if render_host:
         ALLOWED_HOSTS.append(render_host)
@@ -87,14 +89,47 @@ FLW_SECRET_KEY = os.getenv("FLW_SECRET_KEY", "")
 # Database
 # ------------------------
 if RENDER_ENV == "production" and os.getenv("DATABASE_URL"):
+    # Production database from Render or any DATABASE_URL
     DATABASES = {
         "default": dj_database_url.config(conn_max_age=600, ssl_require=True)
     }
 else:
+    # Local development PostgreSQL
+    DB_NAME = os.getenv("DB_NAME", "DjangoDB")
+    DB_USER = os.getenv("DB_USER", "postgres")
+    DB_PASSWORD = os.getenv("DB_PASSWORD", "Omeri@73/")
+    DB_HOST = os.getenv("DB_HOST", "localhost")
+    DB_PORT = os.getenv("DB_PORT", "5432")
+
+    # Try to auto-create the database if it doesn’t exist
+    try:
+        conn = psycopg2.connect(
+            dbname="postgres",
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT,
+        )
+        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
+        cur = conn.cursor()
+        cur.execute(f"SELECT 1 FROM pg_database WHERE datname = '{DB_NAME}'")
+        exists = cur.fetchone()
+        if not exists:
+            cur.execute(f'CREATE DATABASE "{DB_NAME}"')
+            print(f"✅ Created local database: {DB_NAME}")
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ Could not ensure database exists: {e}")
+
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": DB_NAME,
+            "USER": DB_USER,
+            "PASSWORD": DB_PASSWORD,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
         }
     }
 
@@ -114,8 +149,8 @@ INSTALLED_APPS = [
     "django.contrib.sitemaps",
 
     # Third-party apps
-    "django_ckeditor_5",
-
+    "ckeditor",
+    "ckeditor_uploader",
     "crispy_forms",
     "crispy_bootstrap5",
 
@@ -131,7 +166,6 @@ INSTALLED_APPS = [
     "api",
     "ads",
     "donations",
-    "django_extensions",    
 ]
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -172,8 +206,8 @@ TEMPLATES = [
 # ------------------------
 # URLs & WSGI
 # ------------------------
-ROOT_URLCONF = "newsportal.urls"  # <-- replace with your project name
-WSGI_APPLICATION = "newsportal.wsgi.application"  # <-- replace with your project name
+ROOT_URLCONF = "newsportal.urls"  # ⚠️ Make sure this matches your project folder name
+WSGI_APPLICATION = "newsportal.wsgi.application"
 
 # ------------------------
 # Authentication
@@ -215,24 +249,26 @@ MEDIA_ROOT = BASE_DIR / "mediafiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ------------------------
-# CKEditor 5
+# CKEditor
 # ------------------------
-CKEDITOR_5_CONFIGS = {
+CKEDITOR_UPLOAD_PATH = "uploads/articles/"
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_CONFIGS = {
     "default": {
-        "toolbar": [
-            "heading", "|",
-            "bold", "italic", "underline", "strikethrough", "|",
-            "numberedList", "bulletedList", "|",
-            "link", "blockQuote", "insertTable", "codeBlock", "imageUpload", "|",
-            "undo", "redo", "removeFormat"
-        ],
+        "toolbar": "Custom",
         "height": 400,
         "width": "100%",
+        "toolbar_Custom": [
+            ["Bold", "Italic", "Underline", "Strike"],
+            ["NumberedList", "BulletedList", "Blockquote"],
+            ["Link", "Unlink"],
+            ["Image", "CodeSnippet", "Embed", "Table"],
+            ["RemoveFormat", "Source"],
+        ],
+        "extraPlugins": ",".join(["uploadimage", "codesnippet", "embed", "autolink"]),
+        "codeSnippet_theme": "monokai_sublime",
     }
 }
-
-CKEDITOR_5_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
-
 
 # ------------------------
 # Email

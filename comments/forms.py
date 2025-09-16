@@ -2,12 +2,12 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from ckeditor.widgets import CKEditorWidget
+from django_ckeditor_5.widgets import CKEditor5Widget
 from .models import Article, Comment
 
 
 class PostForm(forms.ModelForm):
-    content = forms.CharField(widget=CKEditorWidget())  # Rich text editor
+    content = forms.CharField(widget=CKEditor5Widget(config_name="default"))  # CKEditor 5
 
     class Meta:
         model = Article
@@ -22,12 +22,12 @@ class PostForm(forms.ModelForm):
 
 class CommentForm(forms.ModelForm):
     content = forms.CharField(
-        widget=CKEditorWidget(config_name="default")  # Rich text editor for comments
+        widget=CKEditor5Widget(config_name="default")  # CKEditor 5 for comments
     )
     parent = forms.ModelChoiceField(
         queryset=Comment.objects.all(),
         required=False,
-        widget=forms.HiddenInput  # Hidden input to track parent comment for replies
+        widget=forms.HiddenInput  # Hidden input for replies
     )
 
     class Meta:
